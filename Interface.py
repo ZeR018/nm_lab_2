@@ -24,7 +24,7 @@ class Interface:
         master.configure(bg='#ececec')  # фон
         master.minsize(1200, 650)  # минимальный размер окна
 
-        self.n = tk.IntVar(master, 100) # число разбиений
+        self.n = tk.IntVar(master, 400) # число разбиений
 
         self.flag = tk.BooleanVar(master) #какая задача, True - Основная, False - Тестовая
         self.label = 'График зависимости температура стержня'
@@ -74,8 +74,8 @@ class Interface:
         notebook = ttk.Notebook()
         notebook.grid(row=0, column=2, sticky = 'n', rowspan = 10, pady = (10, 0), padx = (10, 10))
         self.set_nb_frames(notebook)
-        notebook.add(self.main_frame, text='Основная')
         notebook.add(self.test_frame, text='Тестовая')
+        notebook.add(self.main_frame, text='Основная')
         notebook.add(self.graph_frame, text='График погрешности')
 
     def set_nb_frames(self, notebook):
@@ -92,53 +92,37 @@ class Interface:
         execute2 = tk.Button(text='Решить основную задачу', bg='#ececec', highlightbackground='#ececec', command=self.execute_main).grid(
             row=3, column=0, columnspan=2, pady=(10, 10), padx=(10, 0), sticky='nsew')
 
-        self.reference_t = tk.Text(self.test_frame, height=5, width=70, highlightbackground='#cbcbcb')
+        self.reference_t = tk.Text(self.test_frame, height=5, width=81, highlightbackground='#cbcbcb')
         self.reference_t.grid(row=5, column=0, rowspan=3, padx=(10, 10), pady = (10, 10), sticky='w')
 
-        self.reference_m = tk.Text(self.main_frame, height=5, width=70, highlightbackground='#cbcbcb')
+        self.reference_m = tk.Text(self.main_frame, height=5, width=81, highlightbackground='#cbcbcb')
         self.reference_m.grid(row=5, column=0, rowspan=3, padx=(10, 10), pady = (10, 10), sticky='w')
 
-        self.craete_table_main_start()
-        self.craete_table_test_start()
+        self.craete_table_start(self.test_frame)
+        self.craete_table_start(self.main_frame)
 
         self.plotOnPlane_start(self.label, self.main_frame)
         self.plotOnPlane_start(self.label, self.test_frame)
 
-    def craete_table_test_start(self):
-        self.table = ttk.Treeview(self.test_frame, show='headings', height=20)
-        names=['№ узла', 'x', 'u(x)', 'v(x)', '|u(x) - v(x)|']
+    def craete_table_start(self, place):
+        self.table = ttk.Treeview(place, show='headings', height=20)
+        if place==self.test_frame:
+            names=['№ узла', 'x', 'u(x)', 'v(x)', '|u(x) - v(x)|']
+        else:
+            names = ['№ узла', 'x', 'v(x)', 'v2(x2i)', '|v(x) - v2(x2i)|']
         self.table["columns"]=names
-        self.table.grid(row=0, column=0)
+        self.table.grid(row=0, column=0, columnspan=2,padx=(10,), pady=(10,), sticky='wns')
         for i in names:
-            self.table.column(i, anchor="w", width=110)
-            self.table.heading(i, text=i, anchor='w')
-    def craete_table_main_start(self):
-        self.table = ttk.Treeview(self.main_frame, show='headings', height=20)
-        names1=['№ узла', 'x', 'v(x)', 'v2(x2i)', '|v(x) - v2(x2i)|']
-        self.table["columns"]=names1
-        self.table.grid(row=0, column=0)
-        for i in names1:
-            self.table.column(i, anchor="w", width=110)
+            self.table.column(i, anchor="w", width=130)
             self.table.heading(i, text=i, anchor='w')
 
-    def create_table_test(self, ndata):
+    def create_table(self, ndata, place):
         cols = list(ndata.columns)
-        self.table = ttk.Treeview(self.test_frame, show='headings', height=20)
+        self.table = ttk.Treeview(place, show='headings', height=20)
         self.table["columns"] = cols
-        self.table.grid(row=0, column=0, columnspan=2,sticky=tk.W)
+        self.table.grid(row=0, column=0, columnspan=2, padx=(10, 10),pady=(10,), sticky='wns')
         for i in cols:
-            self.table.column(i, anchor="w", width=110)
-            self.table.heading(i, text=i, anchor='w')
-        for index, row in ndata.iterrows():
-            self.table.insert("", 100, text=index, values=list(row))
-
-    def create_table_main(self, ndata):
-        cols = list(ndata.columns)
-        self.table = ttk.Treeview(self.main_frame, show='headings', height=20)
-        self.table["columns"] = cols
-        self.table.grid(row=0, column=0, columnspan=2, sticky=tk.W)
-        for i in cols:
-            self.table.column(i, anchor="w", width=110)
+            self.table.column(i, anchor="w", width=130)
             self.table.heading(i, text=i, anchor='w')
         for index, row in ndata.iterrows():
             self.table.insert("", 100, text=index, values=list(row))
@@ -147,54 +131,44 @@ class Interface:
         scroll_bar1 = Scrollbar(place, orient=VERTICAL, command=self.table.yview)
         scroll_bar1.grid(row=0, column=1, sticky=tk.NS)
         self.table.configure(yscroll=scroll_bar1.set)
+
     def plotOnPlane_start(self, label, place):
         f = plt.figure(figsize=(8, 6), dpi=80, facecolor='#ececec')
         fig = plt.subplot(1, 1, 1)
         fig.set_title(label)
         fig.plot()
         self.create_form_graph(f, place, 1)
-    def plotOnPlane_test(self, label, place, ndata):
+
+    def plotOnPlane(self, label, place, ndata):
         f = plt.figure(figsize=(8, 6), dpi=80, facecolor='#ececec')
         fig = plt.subplot(1, 1, 1)
         fig.set_title(label)
         fig.set_xlabel('x')
-        fig.set_ylabel('v(x)')
         plt.grid()
-        fig.plot(ndata['x'].values, ndata['v(x)'].values, label = "Численная траектория", color='r')
-        fig.plot(ndata['x'].values, ndata['u(x)'].values, label = 'Истинная траектория', linestyle='--', color='b')
-        fig.legend()
-        self.create_form_graph(f, place, 0)
-
-    def plotOnPlane_graph1(self, label, place, ndata):
-        f = plt.figure(figsize=(8, 6), dpi=80, facecolor='#ececec')
-        fig = plt.subplot(1, 1, 1)
-        fig.set_xlabel('x')
-        fig.set_ylabel('|u(x) - v(x)|')
-        fig.set_title('График разности аналитического и численного решений')
-        plt.grid()
-        fig.plot(ndata['x'].values, ndata['|u(x) - v(x)|'].values, color='b')
-        self.create_form_graph(f, place, 0)
-
-    def plotOnPlane_graph2(self, label, place, ndata):
-        f = plt.figure(figsize=(8, 6), dpi=80, facecolor='#ececec')
-        fig = plt.subplot(1, 1, 1)
-        fig.set_xlabel('x')
-        fig.set_ylabel('|v(x) - v2(x2i)|')
-        fig.set_title('График разности аналитического и численного решений')
-        plt.grid()
-        fig.plot(ndata['x'].values, ndata['|v(x) - v2(x2i)|'].values, color='b')
-        self.create_form_graph(f, place, 1)
-
-    def plotOnPlane_main(self, label, place, ndata):
-        f = plt.figure(figsize=(8, 6), dpi=80, facecolor='#ececec')
-        fig = plt.subplot(1, 1, 1)
-        fig.set_title(label)
-        fig.set_xlabel('x')
-        fig.set_ylabel('v(x)')
-        plt.grid()
-        fig.plot(ndata['x'].values, ndata['v(x)'].values, label = "Численная траектория", color='r')
-        fig.legend()
-        self.create_form_graph(f, place, 2)
+        if place==self.test_frame:
+            fig.set_ylabel('v(x)')
+            fig.plot(ndata['x'].values, ndata['v(x)'].values, label = "Численная траектория", color='r')
+            fig.plot(ndata['x'].values, ndata['u(x)'].values, label = 'Истинная траектория', linestyle='--', color='b')
+            fig.legend()
+            self.create_form_graph(f, place, 0)
+        elif place==self.main_frame:
+            fig.set_ylabel('v(x)')
+            fig.plot(ndata['x'].values, ndata['v(x)'].values, label="Численная траектория", color='r')
+            fig.legend()
+            self.create_form_graph(f, place, 2)
+        elif place==self.graph_frame:
+            if self.flag == False:
+                fig.set_ylabel('|u(x) - v(x)|')
+                fig.set_title('График разности аналитического и численного решений')
+                plt.grid()
+                fig.plot(ndata['x'].values, ndata['|u(x) - v(x)|'].values, color='b')
+                self.create_form_graph(f, place, 0)
+            else:
+                fig.set_ylabel('|v(x) - v2(x2i)|')
+                fig.set_title('График разности аналитического и численного решений')
+                plt.grid()
+                fig.plot(ndata['x'].values, ndata['|v(x) - v2(x2i)|'].values, color='b')
+                self.create_form_graph(f, place, 1)
 
     def create_form_graph(self, figure, place, g):
         canvas = FigureCanvasTkAgg(figure, place)
@@ -204,51 +178,53 @@ class Interface:
             canvas.get_tk_widget().grid(row=0, column=2)
         canvas.draw()
 
-    def reference_test(self, ndata):
-        self.reference_t.delete(1.0, END)
+    def reference(self, ndata):
         xmax_error=0
         max_error=0
-        for index, row in ndata.iterrows():
-            if row['|u(x) - v(x)|']>max_error:
-                max_error=row['|u(x) - v(x)|']
-                xmax_error=row['x']
+        if self.flag==True:
+            self.reference_m.delete(1.0, END)
+            for index, row in ndata.iterrows():
+                if row['|v(x) - v2(x2i)|']>max_error:
+                    max_error=row['|v(x) - v2(x2i)|']
+                    xmax_error=row['x']
+            self.reference_m.insert(1.0, 'Справка\n\n')
+            self.reference_m.insert(2.0, 'Для решения задачи использована равномерная сетка счислом разбиений n = ' + str(self.n.get()))
+            self.reference_m.insert(3.0, 'Максимальная погрешность: ' + str(max_error) + ' и наблюдается в точке x = ' + str(
+                xmax_error))
+        else:
+            for index, row in ndata.iterrows():
+                self.reference_t.delete(1.0, END)
+                if row['|u(x) - v(x)|'] > max_error:
+                    max_error = row['|u(x) - v(x)|']
+                    xmax_error = row['x']
 
-        self.reference_t.insert(1.0, 'Справка\n\n')
-        self.reference_t.insert(2.0, 'Для решения задачи использована равномерная сетка счислом разбиений n = ' + str(self.n.get()))
-        self.reference_t.insert(3.0, 'Максимальная погрешность: ' + str(max_error) + ' и наблюдается в точке x = ' + str(xmax_error))
-
-    def reference_main(self, ndata):
-        self.reference_m.delete(1.0, END)
-        xmax_error=0
-        max_error=0
-        for index, row in ndata.iterrows():
-            if row['|v(x) - v2(x2i)|']>max_error:
-                max_error=row['|v(x) - v2(x2i)|']
-                xmax_error=row['x']
-        self.reference_m.insert(1.0, 'Справка\n\n')
-        self.reference_m.insert(2.0, 'Для решения задачи использована равномерная сетка счислом разбиений n = ' + str(self.n.get()))
-        self.reference_m.insert(3.0, 'Максимальная погрешность: ' + str(max_error) + ' и наблюдается в точке x = ' + str(
-            xmax_error))
+            self.reference_t.insert(1.0, 'Справка\n\n')
+            self.reference_t.insert(2.0,
+                                    'Для решения задачи использована равномерная сетка счислом разбиений n = ' + str(
+                                        self.n.get()))
+            self.reference_t.insert(3.0,
+                                    'Максимальная погрешность: ' + str(max_error) + ' и наблюдается в точке x = ' + str(
+                                        xmax_error))
 
     def execute_test(self):
         self.flag = False
         self.result = test(self.n.get())
         self.ndata = self.result.Solution()
-        self.plotOnPlane_test(self.label, self.test_frame, self.ndata)
-        self.create_table_test(self.ndata)
-        self.reference_test(self.ndata)
+        self.plotOnPlane(self.label, self.test_frame, self.ndata)
+        self.create_table(self.ndata, self.test_frame)
+        self.reference(self.ndata)
         self.scroll(self.test_frame)
-        self.plotOnPlane_graph1(self.label, self.graph_frame, self.ndata)
+        self.plotOnPlane(self.label, self.graph_frame, self.ndata)
 
     def execute_main(self):
         self.flag = True
         self.result = main(self.n.get())
         self.ndata1 = self.result.Solution()
-        self.plotOnPlane_main(self.label, self.main_frame, self.ndata1)
-        self.create_table_main(self.ndata1)
-        self.reference_main(self.ndata1)
+        self.plotOnPlane(self.label, self.main_frame, self.ndata1)
+        self.create_table(self.ndata1, self.main_frame)
+        self.reference(self.ndata1)
         self.scroll(self.main_frame)
-        self.plotOnPlane_graph2(self.label, self.graph_frame, self.ndata1)
+        self.plotOnPlane(self.label, self.graph_frame, self.ndata1)
 
 root = tk.Tk()
 gui = Interface(root)

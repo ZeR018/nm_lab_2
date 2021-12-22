@@ -71,7 +71,11 @@ class test:
         # подсчет phi, d
         j = 1
         for i in range(self.n - 1):
-            if self.ksi >= self.x2[i + 1]:
+            if self.x2[i] < self.ksi < self.x2[i + 1]:
+                self.phi[i] = (self.f1(self.x[j]) + self.f2(self.x[j])) / 2
+                self.d[i] = (self.q1(self.x[j]) + self.q2(self.x[j])) / 2
+
+            elif self.ksi >= self.x2[i + 1]:
                 self.phi[i] = self.f1(self.x[j])
                 self.d[i] = self.q1(self.x[j])
 
@@ -79,23 +83,18 @@ class test:
                 self.phi[i] = self.f2(self.x[j])
                 self.d[i] = self.q2(self.x[j])
 
-            elif self.x2[i] < self.ksi < self.x2[i + 1]:
-                self.phi[i] = (self.f1(self.x[j]) + self.f2(self.x[j])) / 2
-                self.d[i] = (self.q1(self.x[j]) + self.q2(self.x[j])) / 2
-
             j += 1
 
         # подсчет a
         j = 1
         for i in range(self.n):
-            if self.ksi >= self.x[j]:
+            if self.x[j - 1] < self.ksi < self.x[j]:
+                self.a[i] = 1 / (1 / (2 * self.k1(self.x[i])) + 1 / (2 * self.k2(self.x[i])))
+            elif self.ksi >= self.x[j]:
                 self.a[i] = self.k1(self.x2[i])
 
             elif self.ksi <= self.x[j - 1]:
                 self.a[i] = self.k2(self.x2[i])
-
-            elif self.x[j - 1] < self.ksi < self.x[j]:
-                self.a[i] = 1 / (1 / (2 * self.k1(self.x[i])) + 1 / (2 * self.k2(self.x[i])))
 
             j += 1
 
