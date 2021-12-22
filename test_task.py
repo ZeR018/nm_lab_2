@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
-
-
-# import sys
+import sys
 
 class test:
     def __init__(self, num_part):
@@ -10,8 +8,8 @@ class test:
         Определение параметров и компонент стационарного уравнения теплоемкости
         """
 
-        # if num_part == 0:
-        #     sys.exit()
+        if num_part == 0:
+             sys.exit()
 
         self.n = num_part
         self.node = self.n + 1
@@ -47,62 +45,16 @@ class test:
         Построение точного решения
         """
 
-        # x1 = 0.1893993677185714
-        # x2 = 0.8106006322814286
-        # x3 = 0.5342937725610412
-        # x4 = 1.488636998155264
-
         c1 = -0.9603081818828776
         c2 = -1.373025151450456
         c3 = -2.459846416926839
         c4 = -6.258903608512381
 
-
-        # y = 0
-        # t = 1
-        # a = np.sqrt(2)
-        # b = 1
-        # f1, f2 = 1, 1
-
         def first(x):
-            # c3 = ((a * np.exp(a * (y - x)) * (self.mu[0] - f1) - b * np.exp(b * (t - x)) * \
-            # (self.mu[1] - f2)) * (np.exp(a * x) - np.exp(a * (2 * y - x))) + (np.exp(a * \
-            # 	(y - x)) * (self.mu[0] - f1) - np.exp(b * (t - x)) * (self.mu[1] - f2) + f1 - f2) * \
-            # (a * np.exp(a * x) + a * np.exp(a * (2*y-x))))/((np.exp(b * x) - np.exp(b * (2 * t - x))) * \
-            # (a * np.exp(a * x) + a * np.exp(a * (2 * y - x))) - (np.exp(a * x) - np.exp(a * (2 * y -x)))*\
-            # (b * np.exp(b * x) + b * np.exp(b * (2 * t - x))))
-            # c1 = (c3 * (np.exp(b * x) - np.exp(b * (2 * t - x))) + np.exp(b * (t - x)) * (self.mu[1] - f2) - \
-            # np.exp(a * (y - x)) * (self.mu[0] - f1) + f2 - f1) / (np.exp(a * x) - np.exp(a * (2 * y - x)))
-            # c2 = np.exp(a * y) * (self.mu[0] - f1 - c1 * np.exp(a * y))
-            # c4 = np.exp(b * t) * (self.mu[1] - f2 - c3 * np.exp(b * t))
-
-            # # лучше пока что нет
-            # x1 = (-np.sqrt(2) * np.exp(1) + np.exp(1) + np.sqrt(2) * np.exp(1 / 2) + 1) / (np.exp(1) + np.exp(3/2) + np.exp(1/2) + 1)
-            # x2 = (np.sqrt(2) * np.exp(1) + np.exp(3/2) - np.sqrt(2) * np.exp(1 / 2) + np.exp(1/2)) / (np.exp(1) + np.exp(3/2) + np.exp(1/2) + 1)
-            # return x1 * np.exp(x * np.sqrt(2)) + x2 * np.exp(-x*np.sqrt(2))
-
-            # return x1 * np.exp(np.sqrt(2) * x) + x2 * np.exp(-np.sqrt(2) * x)
             return c1 * np.exp(np.sqrt(30/209) * x) + c2 * np.exp(-np.sqrt(30/209) * x) + 10/3
 
         def second(x):
-            # np.sqrt(2) * np.exp(np.sqrt(2) / 2) + np.sqrt(2) * np.exp(-np.sqrt(2) / 2) + 2 * np.sqrt(2)) / ((1 - np.sqrt(2)) * \
-            # (np.exp((np.sqrt(2) - 3) / 2) + np.exp((np.sqrt(2) - 1) / 2)) + (-1-np.sqrt(2)) * (np.exp((-np.sqrt(2) - 3) / 2) + \
-            # np.exp((-np.sqrt(2) - 1) / 2)))
-
-            # return (2 * np.exp(-1) - c2 * np.exp(-2)) * np.exp(x) + c2 * np.exp(-x) - 1
-
-            # # лучше пока что нет
-            # x3 = (2 * np.exp(1) + np.sqrt(2) * np.exp(1/2) - np.sqrt(2) + 2) / (np.exp(2) + np.exp(1) + np.exp(3/2) + np.exp(1/2))
-            # x4 = (-np.sqrt(2) * np.exp(2) + 2 * np.exp(2) + 2 * np.exp(1) + np.sqrt(2) * np.exp(3/2)) / (np.exp(1) + np.exp(3/2) + np.exp(1/2) + 1)
-            # return x3 * np.exp(x) + x4 * np.exp(-x) - 1
-
-            # return x3 * np.exp(x) + x4 * np.exp(-x) + 1
             return c3 * np.exp(x) + c4 * np.exp(-x) + 100*np.sin(0.3*np.pi)/9
-
-        # return np.concatenate(([self.mu[0]], \
-        #     np.array([first(self.x[i]) if self.x[i] < self.ksi else second(self.x[i]) for i in range(1, self.node - 1)]), \
-        #     [self.mu[1]]
-        # ))
 
         return np.array([first(self.x[i]) if self.x[i] < self.ksi else second(self.x[i]) for i in range(self.node)])
 
@@ -147,37 +99,10 @@ class test:
 
             j += 1
 
-        # print()
-        # print("x: ", self.x)
-        # print("x2: ", self.x2)
-        # print("phi: ", self.phi)
-        # print("d: ", self.d)
-        # print("a: ", self.a)
-        # print()
-
-        # # нижняя, главная, верхняя диагонали
-        # bottom = np.diag(self.calcdiag(-1), k=-1)
-        # middle = np.diag(self.calcdiag(0), k=0)
-        # high = np.diag(self.calcdiag(1), k=1)
-
-        # # Построим разностную схему в матричном виде: (AAv = b)
-        # self.AA = bottom + middle + high
-
-        # self.A = np.diag(self.AA, k=-1)[:-1]
-        # self.B = np.diag(self.AA, k=1)[1:]
-        # self.C = (-1) * np.diag(self.AA)[1:-1]
-        # self.b = np.concatenate(([self.mu[0]], -self.phi, [self.mu[1]]))
-
         self.A = np.array([self.a[i] / (self.h ** 2) for i in range(self.n - 1)])
         self.B = np.array([self.a[i] / (self.h ** 2) for i in range(1, self.n)])
         self.C = np.array(
             [self.a[i] / (self.h ** 2) + self.a[i + 1] / (self.h ** 2) + self.d[i] for i in range(self.n - 1)])
-
-        # print("C: ", self.C)
-        # print("B: ", self.B)
-        # print("A: ", self.A)
-        # print("AA: \n", self.AA)
-        # print("b: \n", self.b)
 
         # найдем v
         return self.run_through()
@@ -244,17 +169,12 @@ class test:
         """
 
         self.alpha, self.beta = self.direct()
-        # print("alp = ", self.alpha, "\nbeta = ", self.beta)
         return self.reverse()
 
     def Solution(self):
         """
         Составление таблицы
         """
-
-        # print('xi = ', self.x)
-        # print('x2i = ', self.x2)
-        # print()
 
         self.u = self.analytic()
         self.v = np.concatenate(([self.mu[0]], self.numerical()))
@@ -269,8 +189,5 @@ class test:
             '|u(x) - v(x)|': np.round(self.dif, 14)
         })
 
-        # записи
-        note = np.array(
-            [self.n, self.dif[self.node // 2 if self.node % 2 == 1 else int(self.node / 2 - 1)], np.argmax(self.dif)])
 
-        return note, ndata
+        return ndata
